@@ -88,7 +88,7 @@ export function useChallenge(userId) {
           user_id: userId,
           name,
           duration,
-          start_date: new Date().toISOString().split("T")[0],
+          start_date: `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')}`,
         })
         .select()
         .single();
