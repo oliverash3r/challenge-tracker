@@ -11,7 +11,9 @@ export function useChallenge(userId) {
   // Calculate current day number
   const getCurrentDayNumber = useCallback(() => {
     if (!challenge?.start_date) return 1;
-    const start = new Date(challenge.start_date);
+    // Parse date as local time, not UTC
+    const [year, month, day] = challenge.start_date.split('-').map(Number);
+    const start = new Date(year, month - 1, day);
     const today = new Date();
     start.setHours(0, 0, 0, 0);
     today.setHours(0, 0, 0, 0);
@@ -203,7 +205,9 @@ export function useChallenge(userId) {
   const getHabitsForDay = useCallback((dayNumber) => {
     if (!challenge) return [];
 
-    const startDate = new Date(challenge.start_date);
+    // Parse date as local time, not UTC
+    const [year, month, day] = challenge.start_date.split('-').map(Number);
+    const startDate = new Date(year, month - 1, day);
     const targetDate = new Date(startDate);
     targetDate.setDate(targetDate.getDate() + dayNumber - 1);
     const dayOfWeek = targetDate.getDay(); // 0 = Sunday
