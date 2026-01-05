@@ -1,34 +1,26 @@
 import { useState } from "react";
-import { Flame, User, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
+import { Flame, User, Loader2 } from "lucide-react";
 
-export default function Auth({ onAuth, loading, error }) {
-  const [isLogin, setIsLogin] = useState(true);
+export default function Auth({ onAuth, loading }) {
   const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
   const [localError, setLocalError] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLocalError("");
 
-    if (!username || !password) {
-      setLocalError("Por favor completa todos los campos");
+    if (!username) {
+      setLocalError("Por favor ingresa tu nombre");
       return;
     }
 
-    if (username.length < 3) {
-      setLocalError("El usuario debe tener al menos 3 caracteres");
-      return;
-    }
-
-    if (password.length < 6) {
-      setLocalError("La contraseña debe tener al menos 6 caracteres");
+    if (username.length < 2) {
+      setLocalError("El nombre debe tener al menos 2 caracteres");
       return;
     }
 
     try {
-      await onAuth(username, password, isLogin);
+      await onAuth(username);
     } catch (err) {
       // Error is handled by parent
     }
@@ -47,9 +39,7 @@ export default function Auth({ onAuth, loading, error }) {
           </span>
         </div>
         <h1 className="mt-4 text-3xl font-bold text-white">75 Day Challenge</h1>
-        <p className="mt-2 text-purple-200/70">
-          {isLogin ? "Bienvenido de vuelta" : "Comienza tu transformación"}
-        </p>
+        <p className="mt-2 text-purple-200/70">¿Cómo te llamas?</p>
       </div>
 
       {/* Form */}
@@ -59,38 +49,19 @@ export default function Auth({ onAuth, loading, error }) {
           <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-purple-300" />
           <input
             type="text"
-            placeholder="Usuario"
+            placeholder="Tu nombre"
             value={username}
-            onChange={(e) => setUsername(e.target.value.replace(/[^a-zA-Z0-9_]/g, ''))}
+            onChange={(e) => setUsername(e.target.value.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ ]/g, ''))}
             autoCapitalize="words"
             autoCorrect="off"
             className="w-full pl-12 pr-4 py-4 bg-white/10 border border-purple-400/30 rounded-xl text-white placeholder-purple-300/50 focus:outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-400/20 transition-all"
           />
         </div>
 
-        {/* Password */}
-        <div className="relative">
-          <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-purple-300" />
-          <input
-            type={showPassword ? "text" : "password"}
-            placeholder="Contraseña"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full pl-12 pr-12 py-4 bg-white/10 border border-purple-400/30 rounded-xl text-white placeholder-purple-300/50 focus:outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-400/20 transition-all"
-          />
-          <button
-            type="button"
-            onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-purple-300 hover:text-white transition-colors"
-          >
-            {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-          </button>
-        </div>
-
         {/* Error */}
-        {(error || localError) && (
+        {localError && (
           <div className="p-3 bg-red-500/20 border border-red-500/30 rounded-xl text-red-200 text-sm text-center">
-            {localError || error}
+            {localError}
           </div>
         )}
 
@@ -105,27 +76,10 @@ export default function Auth({ onAuth, loading, error }) {
               <Loader2 className="w-5 h-5 animate-spin" />
               Cargando...
             </>
-          ) : isLogin ? (
-            "Iniciar Sesión"
           ) : (
-            "Crear Cuenta"
+            "Comenzar"
           )}
         </button>
-
-        {/* Toggle */}
-        <p className="text-center text-purple-200/70">
-          {isLogin ? "¿No tienes cuenta?" : "¿Ya tienes cuenta?"}{" "}
-          <button
-            type="button"
-            onClick={() => {
-              setIsLogin(!isLogin);
-              setLocalError("");
-            }}
-            className="text-purple-300 hover:text-white font-medium transition-colors"
-          >
-            {isLogin ? "Regístrate" : "Inicia Sesión"}
-          </button>
-        </p>
       </form>
     </div>
   );

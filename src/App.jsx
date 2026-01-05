@@ -16,7 +16,7 @@ const VIEWS = {
 };
 
 function App() {
-  const { user, loading: authLoading, error: authError, signIn, signUp, signOut } = useAuth();
+  const { user, loading: authLoading, signIn, signOut } = useAuth();
   const {
     challenge,
     habits,
@@ -49,12 +49,8 @@ function App() {
     }
   }, [currentView, selectedDay]);
 
-  const handleAuth = async (username, password, isLogin) => {
-    if (isLogin) {
-      await signIn(username, password);
-    } else {
-      await signUp(username, password);
-    }
+  const handleAuth = async (username) => {
+    await signIn(username);
   };
 
   const handleCreateChallenge = async (name, duration, habits) => {
@@ -80,7 +76,7 @@ function App() {
 
   // Auth screen
   if (!user) {
-    return <Auth onAuth={handleAuth} loading={authLoading} error={authError} />;
+    return <Auth onAuth={handleAuth} loading={authLoading} />;
   }
 
   // Challenge setup
