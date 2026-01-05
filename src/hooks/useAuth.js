@@ -22,16 +22,14 @@ export function useAuth() {
     return () => subscription.unsubscribe();
   }, []);
 
-  const signUp = useCallback(async (email, password) => {
+  const signUp = useCallback(async (username, password) => {
     setError(null);
     setLoading(true);
     try {
+      const email = `${username}@challengetracker.app`;
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
-        options: {
-          emailRedirectTo: window.location.origin,
-        }
       });
       if (error) throw error;
       return data;
@@ -43,10 +41,11 @@ export function useAuth() {
     }
   }, []);
 
-  const signIn = useCallback(async (email, password) => {
+  const signIn = useCallback(async (username, password) => {
     setError(null);
     setLoading(true);
     try {
+      const email = `${username}@challengetracker.app`;
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,

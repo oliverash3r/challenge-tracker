@@ -49,11 +49,11 @@ function App() {
     }
   }, [currentView, selectedDay]);
 
-  const handleAuth = async (email, password, isLogin) => {
+  const handleAuth = async (username, password, isLogin) => {
     if (isLogin) {
-      await signIn(email, password);
+      await signIn(username, password);
     } else {
-      await signUp(email, password);
+      await signUp(username, password);
     }
   };
 

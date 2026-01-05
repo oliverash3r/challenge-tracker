@@ -3,7 +3,7 @@ import { Flame, User, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
 
 export default function Auth({ onAuth, loading, error }) {
   const [isLogin, setIsLogin] = useState(true);
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [localError, setLocalError] = useState("");
@@ -12,8 +12,13 @@ export default function Auth({ onAuth, loading, error }) {
     e.preventDefault();
     setLocalError("");
 
-    if (!email || !password) {
+    if (!username || !password) {
       setLocalError("Por favor completa todos los campos");
+      return;
+    }
+
+    if (username.length < 3) {
+      setLocalError("El usuario debe tener al menos 3 caracteres");
       return;
     }
 
@@ -23,7 +28,7 @@ export default function Auth({ onAuth, loading, error }) {
     }
 
     try {
-      await onAuth(email, password, isLogin);
+      await onAuth(username, password, isLogin);
     } catch (err) {
       // Error is handled by parent
     }
@@ -49,14 +54,16 @@ export default function Auth({ onAuth, loading, error }) {
 
       {/* Form */}
       <form onSubmit={handleSubmit} className="w-full max-w-sm space-y-4">
-        {/* Email */}
+        {/* Username */}
         <div className="relative">
           <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-purple-300" />
           <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            type="text"
+            placeholder="Usuario"
+            value={username}
+            onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
+            autoCapitalize="none"
+            autoCorrect="off"
             className="w-full pl-12 pr-4 py-4 bg-white/10 border border-purple-400/30 rounded-xl text-white placeholder-purple-300/50 focus:outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-400/20 transition-all"
           />
         </div>
