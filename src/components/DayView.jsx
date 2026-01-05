@@ -57,7 +57,9 @@ export default function DayView({
 
   const getDateForDay = (dayNumber) => {
     if (!challenge?.start_date) return "";
-    const start = new Date(challenge.start_date);
+    // Parse date as local time, not UTC
+    const [year, month, day] = challenge.start_date.split('-').map(Number);
+    const start = new Date(year, month - 1, day);
     start.setDate(start.getDate() + dayNumber - 1);
     return start.toLocaleDateString("es-ES", {
       weekday: "short",
