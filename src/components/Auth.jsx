@@ -61,8 +61,8 @@ export default function Auth({ onAuth, loading, error }) {
             type="text"
             placeholder="Usuario"
             value={username}
-            onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
-            autoCapitalize="none"
+            onChange={(e) => setUsername(e.target.value.replace(/[^a-zA-Z0-9_]/g, ''))}
+            autoCapitalize="words"
             autoCorrect="off"
             className="w-full pl-12 pr-4 py-4 bg-white/10 border border-purple-400/30 rounded-xl text-white placeholder-purple-300/50 focus:outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-400/20 transition-all"
           />
