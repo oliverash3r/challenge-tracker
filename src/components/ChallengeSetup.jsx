@@ -17,9 +17,11 @@ const DEFAULT_HABITS = [
   { name: "Oración / Biblia", sublabel: "", frequency: "daily", is_weekly_goal: false },
   { name: "Learning progress", sublabel: "", frequency: "daily", is_weekly_goal: false },
   { name: "Acostarme temprano", sublabel: "10:45 PM", frequency: "daily", is_weekly_goal: false },
-  { name: "Ejercicio", sublabel: "3x semana", frequency: "weekly", specific_days: [1, 3, 5], is_weekly_goal: true },
+  { name: "Ejercicio", sublabel: "", frequency: "weekly", weekly_target: 3, is_weekly_goal: true },
   { name: "Church", sublabel: "", frequency: "specific_days", specific_days: [0], is_weekly_goal: false },
 ];
+
+const WEEKLY_TARGET_OPTIONS = [1, 2, 3, 4, 5, 6, 7];
 
 const DURATION_OPTIONS = [21, 30, 60, 75, 90, 100];
 const DAYS_OF_WEEK = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
@@ -34,7 +36,7 @@ export default function ChallengeSetup({ onComplete, loading }) {
   const addHabit = () => {
     setHabits([
       ...habits,
-      { name: "", sublabel: "", frequency: "daily", is_weekly_goal: false },
+      { name: "", sublabel: "", frequency: "daily", is_weekly_goal: false, weekly_target: 3 },
     ]);
     setEditingHabit(habits.length);
   };
@@ -183,10 +185,10 @@ export default function ChallengeSetup({ onComplete, loading }) {
                   )}
                 </div>
                 <span className="text-xs px-2 py-1 bg-purple-500/20 text-purple-200 rounded-full flex-shrink-0">
-                  {habit.frequency === "daily"
+                  {habit.is_weekly_goal
+                    ? `${habit.weekly_target || 3}x/semana`
+                    : habit.frequency === "daily"
                     ? "Diario"
-                    : habit.frequency === "weekly"
-                    ? "Semanal"
                     : "Días específicos"}
                 </span>
               </div>
@@ -205,36 +207,60 @@ export default function ChallengeSetup({ onComplete, loading }) {
                     className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-purple-300/50 text-sm focus:outline-none focus:border-purple-400"
                   />
 
-                  {/* Frequency */}
-                  <div className="flex gap-2">
-                    {[
-                      { value: "daily", label: "Diario" },
-                      { value: "weekly", label: "Semanal" },
-                      { value: "specific_days", label: "Días" },
-                    ].map((freq) => (
-                      <button
-                        key={freq.value}
-                        onClick={() =>
-                          updateHabit(index, {
-                            frequency: freq.value,
-                            specific_days:
-                              freq.value !== "daily" ? habit.specific_days || [] : null,
-                          })
-                        }
-                        className={`flex-1 py-2 text-sm rounded-lg transition-colors ${
-                          habit.frequency === freq.value
-                            ? "bg-purple-500 text-white"
-                            : "bg-white/5 text-purple-200 hover:bg-white/10"
-                        }`}
-                      >
-                        {freq.label}
-                      </button>
-                    ))}
-                  </div>
+                  {/* Frequency - only show for non-weekly-goals */}
+                  {!habit.is_weekly_goal && (
+                    <div className="flex gap-2">
+                      {[
+                        { value: "daily", label: "Diario" },
+                        { value: "specific_days", label: "Días específicos" },
+                      ].map((freq) => (
+                        <button
+                          key={freq.value}
+                          onClick={() =>
+                            updateHabit(index, {
+                              frequency: freq.value,
+                              specific_days:
+                                freq.value !== "daily" ? habit.specific_days || [] : null,
+                            })
+                          }
+                          className={`flex-1 py-2 text-sm rounded-lg transition-colors ${
+                            habit.frequency === freq.value
+                              ? "bg-purple-500 text-white"
+                              : "bg-white/5 text-purple-200 hover:bg-white/10"
+                          }`}
+                        >
+                          {freq.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
 
-                  {/* Day Picker */}
-                  {(habit.frequency === "weekly" ||
-                    habit.frequency === "specific_days") && (
+                  {/* Weekly Target Selector - for weekly goals */}
+                  {habit.is_weekly_goal && (
+                    <div>
+                      <label className="text-sm text-purple-200/70 mb-2 block">
+                        ¿Cuántas veces por semana?
+                      </label>
+                      <div className="flex gap-1">
+                        {WEEKLY_TARGET_OPTIONS.map((target) => (
+                          <button
+                            key={target}
+                            onClick={() => updateHabit(index, { weekly_target: target })}
+                            className={`flex-1 py-2 text-sm rounded-lg transition-colors ${
+                              (habit.weekly_target || 3) === target
+                                ? "bg-purple-500 text-white"
+                                : "bg-white/5 text-purple-200 hover:bg-white/10"
+                            }`}
+                          >
+                            {target}x
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Day Picker - only for specific_days frequency (non-weekly-goals) */}
+                  {!habit.is_weekly_goal && habit.frequency === "specific_days" && (
                     <div className="flex gap-1">
                       {DAYS_OF_WEEK.map((day, dayIndex) => (
                         <button
@@ -259,7 +285,11 @@ export default function ChallengeSetup({ onComplete, loading }) {
                         habit.is_weekly_goal ? "bg-purple-500" : "bg-white/20"
                       }`}
                       onClick={() =>
-                        updateHabit(index, { is_weekly_goal: !habit.is_weekly_goal })
+                        updateHabit(index, {
+                          is_weekly_goal: !habit.is_weekly_goal,
+                          frequency: !habit.is_weekly_goal ? "weekly" : "daily",
+                          weekly_target: habit.weekly_target || 3,
+                        })
                       }
                     >
                       <div

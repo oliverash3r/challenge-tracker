@@ -103,6 +103,7 @@ export function useChallenge(userId) {
         frequency: habit.frequency,
         specific_days: habit.specific_days || null,
         is_weekly_goal: habit.is_weekly_goal || false,
+        weekly_target: habit.weekly_target || 3,
         sort_order: index,
       }));
 
@@ -214,7 +215,10 @@ export function useChallenge(userId) {
 
     return habits.filter(habit => {
       if (habit.frequency === "daily") return true;
-      if (habit.frequency === "weekly" || habit.frequency === "specific_days") {
+      // Weekly goals appear every day (flexible completion)
+      if (habit.is_weekly_goal) return true;
+      // Specific days habits only appear on those days
+      if (habit.frequency === "specific_days") {
         return habit.specific_days?.includes(dayOfWeek);
       }
       return true;
@@ -226,18 +230,54 @@ export function useChallenge(userId) {
     return completions.filter(c => c.day_number === dayNumber);
   }, [completions]);
 
+  // Get weekly goal progress for a specific habit and day
+  // Returns { completed: number, target: number, weekStart: number, weekEnd: number }
+  const getWeeklyGoalProgress = useCallback((habitId, dayNumber) => {
+    if (!challenge) return { completed: 0, target: 3, weekStart: 1, weekEnd: 7 };
+
+    const habit = habits.find(h => h.id === habitId);
+    if (!habit) return { completed: 0, target: 3, weekStart: 1, weekEnd: 7 };
+
+    const target = habit.weekly_target || 3;
+
+    // Calculate which week this day belongs to (weeks start on day 1, 8, 15, etc.)
+    const weekNumber = Math.ceil(dayNumber / 7);
+    const weekStart = (weekNumber - 1) * 7 + 1;
+    const weekEnd = Math.min(weekNumber * 7, challenge.duration);
+
+    // Count completions for this habit within this week
+    const weekCompletions = completions.filter(
+      c => c.habit_id === habitId && c.day_number >= weekStart && c.day_number <= weekEnd
+    );
+
+    return {
+      completed: weekCompletions.length,
+      target,
+      weekStart,
+      weekEnd,
+    };
+  }, [habits, completions, challenge]);
+
   // Calculate completion percentage for a day
   const getDayCompletionPercentage = useCallback((dayNumber) => {
     const dayHabits = getHabitsForDay(dayNumber);
     if (dayHabits.length === 0) return 100;
 
     const dayCompletions = getCompletionsForDay(dayNumber);
-    const completedCount = dayHabits.filter(h =>
-      dayCompletions.some(c => c.habit_id === h.id)
-    ).length;
+    const completedCount = dayHabits.filter(h => {
+      // For weekly goals: count as done if completed this day OR weekly target already met
+      if (h.is_weekly_goal) {
+        const isCompletedToday = dayCompletions.some(c => c.habit_id === h.id);
+        if (isCompletedToday) return true;
+        const progress = getWeeklyGoalProgress(h.id, dayNumber);
+        return progress.completed >= progress.target;
+      }
+      // For regular habits: just check if completed this day
+      return dayCompletions.some(c => c.habit_id === h.id);
+    }).length;
 
     return Math.round((completedCount / dayHabits.length) * 100);
-  }, [getHabitsForDay, getCompletionsForDay]);
+  }, [getHabitsForDay, getCompletionsForDay, getWeeklyGoalProgress]);
 
   // Calculate streak
   const calculateStreak = useCallback(() => {
@@ -304,6 +344,7 @@ export function useChallenge(userId) {
     getCurrentDayNumber,
     getHabitsForDay,
     getCompletionsForDay,
+    getWeeklyGoalProgress,
     getDayCompletionPercentage,
     calculateStreak,
     calculateBestStreak,

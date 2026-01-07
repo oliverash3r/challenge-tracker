@@ -24,6 +24,7 @@ CREATE TABLE habits (
   frequency TEXT NOT NULL DEFAULT 'daily',
   specific_days INTEGER[],
   is_weekly_goal BOOLEAN DEFAULT FALSE,
+  weekly_target INTEGER DEFAULT 3, -- Target completions per week for weekly goals
   sort_order INTEGER DEFAULT 0,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -52,3 +53,6 @@ CREATE INDEX idx_challenges_user_id ON challenges(user_id);
 CREATE INDEX idx_habits_challenge_id ON habits(challenge_id);
 CREATE INDEX idx_completions_habit_id ON completions(habit_id);
 CREATE INDEX idx_completions_day_number ON completions(day_number);
+
+-- Migration for existing databases (run this if you already have the schema):
+-- ALTER TABLE habits ADD COLUMN IF NOT EXISTS weekly_target INTEGER DEFAULT 3;

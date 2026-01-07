@@ -16,6 +16,7 @@ export default function DayView({
   currentDayNumber,
   getHabitsForDay,
   getCompletionsForDay,
+  getWeeklyGoalProgress,
   getDayCompletionPercentage,
   toggleCompletion,
   streak,
@@ -168,15 +169,19 @@ export default function DayView({
               Metas Semanales
             </h3>
             <div className="space-y-2">
-              {weeklyGoals.map((habit) => (
-                <HabitCard
-                  key={habit.id}
-                  habit={habit}
-                  isCompleted={dayCompletions.some((c) => c.habit_id === habit.id)}
-                  onToggle={() => toggleCompletion(habit.id, selectedDay)}
-                  disabled={!canEdit}
-                />
-              ))}
+              {weeklyGoals.map((habit) => {
+                const weeklyProgress = getWeeklyGoalProgress(habit.id, selectedDay);
+                return (
+                  <HabitCard
+                    key={habit.id}
+                    habit={habit}
+                    isCompleted={dayCompletions.some((c) => c.habit_id === habit.id)}
+                    onToggle={() => toggleCompletion(habit.id, selectedDay)}
+                    disabled={!canEdit}
+                    weeklyProgress={weeklyProgress}
+                  />
+                );
+              })}
             </div>
           </div>
         )}

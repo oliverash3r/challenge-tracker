@@ -27,6 +27,7 @@ function App() {
     getCurrentDayNumber,
     getHabitsForDay,
     getCompletionsForDay,
+    getWeeklyGoalProgress,
     getDayCompletionPercentage,
     calculateStreak,
     calculateBestStreak,
@@ -109,6 +110,7 @@ function App() {
           currentDayNumber={currentDayNumber}
           getHabitsForDay={getHabitsForDay}
           getCompletionsForDay={getCompletionsForDay}
+          getWeeklyGoalProgress={getWeeklyGoalProgress}
           getDayCompletionPercentage={getDayCompletionPercentage}
           toggleCompletion={toggleCompletion}
           streak={streak}
