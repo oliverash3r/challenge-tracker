@@ -215,7 +215,11 @@ export function useChallenge(userId) {
 
     return habits.filter(habit => {
       if (habit.frequency === "daily") return true;
-      // Weekly goals appear every day (flexible completion)
+      // Check specific days first - applies to both weekly goals and regular habits
+      if (habit.specific_days && habit.specific_days.length > 0) {
+        return habit.specific_days.includes(dayOfWeek);
+      }
+      // Weekly goals without specific days appear every day (flexible completion)
       if (habit.is_weekly_goal) return true;
       // Specific days habits only appear on those days
       if (habit.frequency === "specific_days") {

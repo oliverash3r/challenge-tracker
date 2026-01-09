@@ -259,6 +259,33 @@ export default function ChallengeSetup({ onComplete, loading }) {
                     </div>
                   )}
 
+                  {/* Day Picker - for specific days or weekly goals with specific days */}
+                  {habit.is_weekly_goal && (
+                    <div>
+                      <label className="text-sm text-purple-200/70 mb-2 block">
+                        ¿Solo ciertos días? (opcional)
+                      </label>
+                      <div className="flex gap-1">
+                        {DAYS_OF_WEEK.map((day, dayIndex) => (
+                          <button
+                            key={day}
+                            onClick={() => toggleDay(index, dayIndex)}
+                            className={`flex-1 py-2 text-xs rounded-lg transition-colors ${
+                              habit.specific_days?.includes(dayIndex)
+                                ? "bg-purple-500 text-white"
+                                : "bg-white/5 text-purple-200 hover:bg-white/10"
+                            }`}
+                          >
+                            {day}
+                          </button>
+                        ))}
+                      </div>
+                      <p className="text-xs text-purple-300/50 mt-1">
+                        Deja vacío para cualquier día
+                      </p>
+                    </div>
+                  )}
+
                   {/* Day Picker - only for specific_days frequency (non-weekly-goals) */}
                   {!habit.is_weekly_goal && habit.frequency === "specific_days" && (
                     <div className="flex gap-1">
