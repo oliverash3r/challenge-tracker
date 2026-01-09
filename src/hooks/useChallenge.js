@@ -127,6 +127,27 @@ export function useChallenge(userId) {
     }
   }, [userId]);
 
+  // Update an existing habit
+  const updateHabit = useCallback(async (habitId, updates) => {
+    // Optimistic update
+    setHabits(prev => prev.map(h =>
+      h.id === habitId ? { ...h, ...updates } : h
+    ));
+
+    try {
+      const { error } = await supabase
+        .from("habits")
+        .update(updates)
+        .eq("id", habitId);
+
+      if (error) throw error;
+    } catch (err) {
+      // Revert on error
+      fetchChallenge();
+      setError(err.message);
+    }
+  }, [fetchChallenge]);
+
   // Toggle habit completion
   const toggleCompletion = useCallback(async (habitId, dayNumber) => {
     const isCompleted = completions.some(
@@ -344,6 +365,7 @@ export function useChallenge(userId) {
     loading,
     error,
     createChallenge,
+    updateHabit,
     toggleCompletion,
     getCurrentDayNumber,
     getHabitsForDay,

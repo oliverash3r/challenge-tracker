@@ -6,6 +6,7 @@ import ChallengeSetup from "./components/ChallengeSetup";
 import DayView from "./components/DayView";
 import Calendar from "./components/Calendar";
 import Stats from "./components/Stats";
+import EditHabits from "./components/EditHabits";
 import { Loader2 } from "lucide-react";
 
 // Views
@@ -13,6 +14,7 @@ const VIEWS = {
   DAY: "day",
   CALENDAR: "calendar",
   STATS: "stats",
+  EDIT_HABITS: "edit_habits",
 };
 
 function App() {
@@ -23,6 +25,7 @@ function App() {
     completions,
     loading: challengeLoading,
     createChallenge,
+    updateHabit,
     toggleCompletion,
     getCurrentDayNumber,
     getHabitsForDay,
@@ -139,7 +142,16 @@ function App() {
           overallCompletion={overallCompletion}
           getDayCompletionPercentage={getDayCompletionPercentage}
           onBack={() => setCurrentView(VIEWS.DAY)}
+          onEditHabits={() => setCurrentView(VIEWS.EDIT_HABITS)}
           onSignOut={signOut}
+        />
+      )}
+
+      {currentView === VIEWS.EDIT_HABITS && (
+        <EditHabits
+          habits={habits}
+          onUpdateHabit={updateHabit}
+          onBack={() => setCurrentView(VIEWS.STATS)}
         />
       )}
     </>

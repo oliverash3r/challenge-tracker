@@ -7,6 +7,7 @@ import {
   Award,
   Calendar,
   LogOut,
+  Settings,
 } from "lucide-react";
 import ProgressRing from "./ProgressRing";
 
@@ -18,6 +19,7 @@ export default function Stats({
   overallCompletion,
   getDayCompletionPercentage,
   onBack,
+  onEditHabits,
   onSignOut,
 }) {
   // Calculate weekly stats
@@ -223,7 +225,7 @@ export default function Stats({
         </div>
 
         {/* Overall Progress Bar */}
-        <div className="p-4 bg-white/5 rounded-2xl">
+        <div className="p-4 bg-white/5 rounded-2xl mb-6">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm text-purple-200/70">Progreso Total</span>
             <span className="text-sm font-medium text-white">
@@ -242,6 +244,15 @@ export default function Stats({
               : `${daysRemaining} días para completar tu ${challenge?.duration || 75} Day Challenge`}
           </p>
         </div>
+
+        {/* Edit Habits Button */}
+        <button
+          onClick={onEditHabits}
+          className="w-full p-4 bg-white/5 rounded-2xl border border-white/10 flex items-center gap-3 hover:bg-white/10 transition-colors"
+        >
+          <Settings className="w-5 h-5 text-purple-400" />
+          <span className="text-white">Editar Hábitos</span>
+        </button>
       </div>
     </div>
   );
